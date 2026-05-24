@@ -7,12 +7,12 @@ export const DonutChart: React.FC = () => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   // SVG parameters
-  const size = 200;
+  const size = 240;
   const center = size / 2;
-  const radius = 55;
-  const strokeWidth = 14;
-  const hoveredStrokeWidth = 18;
-  const circumference = 2 * Math.PI * radius; // ~345.58
+  const radius = 70;
+  const strokeWidth = 16;
+  const hoveredStrokeWidth = 20;
+  const circumference = 2 * Math.PI * radius; // ~439.82
 
   // Calculate cumulative percentages to position the stroke offsets
   const segments = React.useMemo(() => {
@@ -185,8 +185,8 @@ export const DonutChart: React.FC = () => {
         }
         .svg-container {
           position: relative;
-          width: 190px;
-          height: 190px;
+          width: 220px;
+          height: 220px;
           flex-shrink: 0;
         }
         .donut-center-text {
@@ -201,7 +201,7 @@ export const DonutChart: React.FC = () => {
           justify-content: center;
           pointer-events: none;
           text-align: center;
-          padding: 1rem;
+          padding: 1.5rem;
         }
         .center-label {
           font-size: 0.6875rem;
@@ -211,12 +211,12 @@ export const DonutChart: React.FC = () => {
           letter-spacing: 0.05em;
         }
         .center-value {
-          font-size: 1.25rem;
+          font-size: 1.375rem;
           font-weight: 800;
           color: var(--text-primary);
           margin: 0.125rem 0;
           word-break: break-all;
-          max-width: 130px;
+          max-width: 160px;
         }
         .center-subtext {
           font-size: 0.6875rem;

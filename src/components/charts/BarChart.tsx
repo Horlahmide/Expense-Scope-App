@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useExpenses } from '../../context/ExpenseContext';
 import { formatAmount, formatDateLabel } from '../../utils/dateHelpers';
+import { APP_CONFIG } from '../../utils/categoryConfig';
 
 export const BarChart: React.FC = () => {
   const { dailySpending } = useExpenses();
@@ -89,7 +90,7 @@ export const BarChart: React.FC = () => {
                     fontWeight="600"
                     textAnchor="start"
                   >
-                    ${gridVal.toFixed(0)}
+                    {APP_CONFIG.currencySymbol}{gridVal.toFixed(0)}
                   </text>
                 )}
               </g>

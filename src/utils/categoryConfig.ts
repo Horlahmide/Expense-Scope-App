@@ -8,6 +8,10 @@ export interface CategoryInfo {
   iconPath: string;    // SVG path string (viewBox assumed 0 0 24 24)
 }
 
+export const APP_CONFIG = {
+  currencySymbol: '$',
+};
+
 export const CATEGORY_CONFIG: Record<Category, CategoryInfo> = {
   food: {
     label: 'Food & Dining',

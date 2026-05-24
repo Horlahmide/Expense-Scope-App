@@ -6,6 +6,7 @@ import { ExpenseForm } from './components/expense/ExpenseForm';
 import { ExpenseList } from './components/expense/ExpenseList';
 import { DonutChart } from './components/charts/DonutChart';
 import { BarChart } from './components/charts/BarChart';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 const DashboardContent: React.FC = () => {
   return (
@@ -38,14 +39,22 @@ const DashboardContent: React.FC = () => {
       <div className="dashboard-grid">
         {/* Left Column: Log Expense & History list */}
         <div className="dashboard-column gap-1-5">
-          <ExpenseForm />
-          <ExpenseList />
+          <ErrorBoundary>
+            <ExpenseForm />
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <ExpenseList />
+          </ErrorBoundary>
         </div>
 
         {/* Right Column: Visual analytics charts */}
         <div className="dashboard-column gap-1-5">
-          <DonutChart />
-          <BarChart />
+          <ErrorBoundary>
+            <DonutChart />
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <BarChart />
+          </ErrorBoundary>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useExpenses } from '../../context/ExpenseContext';
 import type { Category } from '../../types';
-import { CATEGORY_CONFIG } from '../../utils/categoryConfig';
+import { CATEGORY_CONFIG, APP_CONFIG } from '../../utils/categoryConfig';
 import { formatLocalDate } from '../../utils/dateHelpers';
 
 export const ExpenseForm: React.FC = () => {
@@ -55,8 +55,15 @@ export const ExpenseForm: React.FC = () => {
     
     // Trigger temporary visual success feedback
     setSuccess(true);
-    setTimeout(() => setSuccess(false), 2000);
   };
+
+  // Effect to handle success message timeout cleanup
+  React.useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
   return (
     <div className="glass-card expense-form-card animate-fade-in">
@@ -80,7 +87,7 @@ export const ExpenseForm: React.FC = () => {
 
         <div className="form-row-2">
           <div className="form-group">
-            <label htmlFor="amount" className="form-label">Amount ($)</label>
+            <label htmlFor="amount" className="form-label">Amount ({APP_CONFIG.currencySymbol})</label>
             <input
               id="amount"
               type="number"

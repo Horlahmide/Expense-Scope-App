@@ -1,3 +1,5 @@
+import { APP_CONFIG } from './categoryConfig';
+
 /**
  * Parses a YYYY-MM-DD date string into a local Date object.
  * Avoids timezone offsets that occur when parsing ISO strings globally.
@@ -103,7 +105,7 @@ export function formatDateLabel(dateStr: string, referenceDate: Date = new Date(
 /**
  * Formats an amount with a local currency formatting.
  */
-export function formatAmount(amount: number, currencySymbol: string = '$'): string {
+export function formatAmount(amount: number, currencySymbol: string = APP_CONFIG.currencySymbol): string {
   return `${currencySymbol}${amount.toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

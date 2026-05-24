@@ -43,6 +43,19 @@ interface ExpenseContextType {
 
 const ExpenseContext = createContext<ExpenseContextType | undefined>(undefined);
 
+// Validator for local storage data
+const isValidExpenseArray = (data: any): data is Expense[] => {
+  if (!Array.isArray(data)) return false;
+  return data.every(item => 
+    typeof item.id === 'string' &&
+    typeof item.amount === 'number' &&
+    ['food', 'transport', 'data', 'fun', 'other'].includes(item.category) &&
+    typeof item.date === 'string' &&
+    !isNaN(Date.parse(item.date)) &&
+    typeof item.description === 'string'
+  );
+};
+
 // Generate realistic seed data relative to the current local time
 const getDemoExpenses = (): Expense[] => {
   const ref = new Date();
@@ -127,15 +140,8 @@ const getDemoExpenses = (): Expense[] => {
 };
 
 export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [expenses, setExpenses] = useLocalStorage<Expense[]>('expensescope_expenses', []);
+  const [expenses, setExpenses] = useLocalStorage<Expense[]>('expensescope_expenses', [], isValidExpenseArray);
   const [filter, setFilter] = useState<TimeFilter>('this-week');
-
-  // Auto-seed demo data if storage is empty on first load
-  useEffect(() => {
-    if (expenses.length === 0) {
-      setExpenses(getDemoExpenses());
-    }
-  }, [expenses, setExpenses]);
 
   const addExpense = (newExpense: Omit<Expense, 'id'>) => {
     const expenseWithId: Expense = {
@@ -159,9 +165,10 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // 1. Calculate current week's total (always relative to "this-week" regardless of active filter)
   const currentWeekTotal = useMemo(() => {
-    return expenses
+    const rawTotal = expenses
       .filter((exp) => isInThisWeek(exp.date))
       .reduce((sum, exp) => sum + exp.amount, 0);
+    return Math.round(rawTotal * 100) / 100;
   }, [expenses]);
 
   // 2. Filter expenses based on the selected TimeFilter
@@ -175,7 +182,8 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // 3. Total spend for the active filter
   const filteredTotal = useMemo(() => {
-    return filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const rawTotal = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+    return Math.round(rawTotal * 100) / 100;
   }, [filteredExpenses]);
 
   // 4. Calculate category aggregation (for Donut Chart)
@@ -197,11 +205,17 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     });
 
+    // Round category totals
+    (Object.keys(totals) as Category[]).forEach(cat => {
+      totals[cat] = Math.round(totals[cat] * 100) / 100;
+    });
+
     const totalSpend = Object.values(totals).reduce((sum, val) => sum + val, 0);
+    const roundedTotalSpend = Math.round(totalSpend * 100) / 100;
 
     return (Object.keys(totals) as Category[]).map((cat) => {
       const amount = totals[cat];
-      const percentage = totalSpend > 0 ? (amount / totalSpend) * 100 : 0;
+      const percentage = roundedTotalSpend > 0 ? (amount / roundedTotalSpend) * 100 : 0;
       const config = CATEGORY_CONFIG[cat];
       return {
         category: cat,
@@ -248,17 +262,17 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const dayDate = parseLocalDate(dateStr);
       // Weekday label
       const label = dayDate.toLocaleDateString(undefined, { weekday: 'short' });
-      const amount = expenses
+      const rawAmount = filteredExpenses
         .filter((exp) => exp.date === dateStr)
         .reduce((sum, exp) => sum + exp.amount, 0);
 
       return {
         date: dateStr,
         label,
-        amount,
+        amount: Math.round(rawAmount * 100) / 100,
       };
     });
-  }, [expenses, filter]);
+  }, [filteredExpenses, filter]);
 
   return (
     <ExpenseContext.Provider
