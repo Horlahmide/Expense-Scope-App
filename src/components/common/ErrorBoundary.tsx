@@ -1,4 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component } from "react";
+import type { ErrorInfo, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -11,7 +12,7 @@ interface State {
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
   };
 
   public static getDerivedStateFromError(_: Error): State {
@@ -24,19 +25,22 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
-      return this.props.fallback || (
-        <div className="glass-card error-boundary-fallback animate-fade-in">
-          <div className="error-icon">⚠️</div>
-          <h2 className="error-title">Something went wrong</h2>
-          <p className="error-message">This component failed to load. Try refreshing the page.</p>
-          <button 
-            className="btn btn-primary btn-sm"
-            onClick={() => window.location.reload()}
-          >
-            Refresh Page
-          </button>
+      return (
+        this.props.fallback || (
+          <div className="glass-card error-boundary-fallback animate-fade-in">
+            <div className="error-icon">⚠️</div>
+            <h2 className="error-title">Something went wrong</h2>
+            <p className="error-message">
+              This component failed to load. Try refreshing the page.
+            </p>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => window.location.reload()}
+            >
+              Refresh Page
+            </button>
 
-          <style>{`
+            <style>{`
             .error-boundary-fallback {
               display: flex;
               flex-direction: column;
@@ -64,7 +68,8 @@ export class ErrorBoundary extends Component<Props, State> {
               max-width: 280px;
             }
           `}</style>
-        </div>
+          </div>
+        )
       );
     }
 

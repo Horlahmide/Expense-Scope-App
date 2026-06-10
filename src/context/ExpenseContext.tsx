@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
-import type { Expense, Category, TimeFilter } from '../types';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import React, { createContext, useContext, useMemo, useState } from "react";
+import type { Expense, Category, TimeFilter } from "../types";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 import {
   isInThisWeek,
   isInLastWeek,
@@ -8,8 +8,8 @@ import {
   getStartOfWeek,
   formatLocalDate,
   parseLocalDate,
-} from '../utils/dateHelpers';
-import { CATEGORY_CONFIG } from '../utils/categoryConfig';
+} from "../utils/dateHelpers";
+import { CATEGORY_CONFIG } from "../utils/categoryConfig";
 
 export interface CategoryAggregate {
   category: Category;
@@ -31,7 +31,7 @@ interface ExpenseContextType {
   filteredExpenses: Expense[];
   filter: TimeFilter;
   setFilter: (filter: TimeFilter) => void;
-  addExpense: (expense: Omit<Expense, 'id'>) => void;
+  addExpense: (expense: Omit<Expense, "id">) => void;
   deleteExpense: (id: string) => void;
   clearAllExpenses: () => void;
   loadDemoData: () => void;
@@ -46,13 +46,14 @@ const ExpenseContext = createContext<ExpenseContextType | undefined>(undefined);
 // Validator for local storage data
 const isValidExpenseArray = (data: any): data is Expense[] => {
   if (!Array.isArray(data)) return false;
-  return data.every(item => 
-    typeof item.id === 'string' &&
-    typeof item.amount === 'number' &&
-    ['food', 'transport', 'data', 'fun', 'other'].includes(item.category) &&
-    typeof item.date === 'string' &&
-    !isNaN(Date.parse(item.date)) &&
-    typeof item.description === 'string'
+  return data.every(
+    (item) =>
+      typeof item.id === "string" &&
+      typeof item.amount === "number" &&
+      ["food", "transport", "data", "fun", "other"].includes(item.category) &&
+      typeof item.date === "string" &&
+      !isNaN(Date.parse(item.date)) &&
+      typeof item.description === "string",
   );
 };
 
@@ -67,83 +68,89 @@ const getDemoExpenses = (): Expense[] => {
 
   return [
     {
-      id: 'demo-1',
-      amount: 45.50,
-      category: 'food',
+      id: "demo-1",
+      amount: 45.5,
+      category: "food",
       date: getOffsetDateStr(0), // Today
-      description: 'Sushi lunch with team',
+      description: "Sushi lunch with team",
     },
     {
-      id: 'demo-2',
-      amount: 12.00,
-      category: 'transport',
+      id: "demo-2",
+      amount: 12.0,
+      category: "transport",
       date: getOffsetDateStr(0), // Today
-      description: 'Uber ride home',
+      description: "Uber ride home",
     },
     {
-      id: 'demo-3',
-      amount: 75.00,
-      category: 'data',
+      id: "demo-3",
+      amount: 75.0,
+      category: "data",
       date: getOffsetDateStr(1), // Yesterday
-      description: 'Monthly internet subscription',
+      description: "Monthly internet subscription",
     },
     {
-      id: 'demo-4',
-      amount: 28.00,
-      category: 'fun',
+      id: "demo-4",
+      amount: 28.0,
+      category: "fun",
       date: getOffsetDateStr(2), // 2 days ago
-      description: 'Cinema ticket & snacks',
+      description: "Cinema ticket & snacks",
     },
     {
-      id: 'demo-5',
-      amount: 18.90,
-      category: 'food',
+      id: "demo-5",
+      amount: 18.9,
+      category: "food",
       date: getOffsetDateStr(3), // 3 days ago
-      description: 'Breakfast coffee & pastry',
+      description: "Breakfast coffee & pastry",
     },
     {
-      id: 'demo-6',
-      amount: 92.50,
-      category: 'food',
+      id: "demo-6",
+      amount: 92.5,
+      category: "food",
       date: getOffsetDateStr(4), // 4 days ago
-      description: 'Weekly grocery shopping',
+      description: "Weekly grocery shopping",
     },
     {
-      id: 'demo-7',
-      amount: 35.00,
-      category: 'transport',
+      id: "demo-7",
+      amount: 35.0,
+      category: "transport",
       date: getOffsetDateStr(5), // 5 days ago
-      description: 'Gas station fuel refill',
+      description: "Gas station fuel refill",
     },
     {
-      id: 'demo-8',
-      amount: 120.00,
-      category: 'fun',
+      id: "demo-8",
+      amount: 120.0,
+      category: "fun",
       date: getOffsetDateStr(8), // 8 days ago (Last Week)
-      description: 'Weekend concert tickets',
+      description: "Weekend concert tickets",
     },
     {
-      id: 'demo-9',
-      amount: 15.50,
-      category: 'other',
+      id: "demo-9",
+      amount: 15.5,
+      category: "other",
       date: getOffsetDateStr(10), // 10 days ago (Last Week)
-      description: 'Sticky notes & pens',
+      description: "Sticky notes & pens",
     },
     {
-      id: 'demo-10',
-      amount: 250.00,
-      category: 'other',
+      id: "demo-10",
+      amount: 250.0,
+      category: "other",
       date: getOffsetDateStr(15), // 15 days ago (Older)
-      description: 'Ergonomic office chair',
+      description: "Ergonomic office chair",
     },
   ];
 };
 
-export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [expenses, setExpenses] = useLocalStorage<Expense[]>('expensescope_expenses', [], isValidExpenseArray);
-  const [filter, setFilter] = useState<TimeFilter>('this-week');
+export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [expenses, setExpenses] = useLocalStorage<Expense[]>(
+    "expensescope_expenses",
+    [],
+    isValidExpenseArray,
+  );
+  const [filter, setFilter] = useState<TimeFilter>("this-week");
 
-  const addExpense = (newExpense: Omit<Expense, 'id'>) => {
+  const addExpense = (newExpense: Omit<Expense, "id">) => {
     const expenseWithId: Expense = {
       ...newExpense,
       id: `exp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -174,8 +181,8 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // 2. Filter expenses based on the selected TimeFilter
   const filteredExpenses = useMemo(() => {
     return expenses.filter((exp) => {
-      if (filter === 'this-week') return isInThisWeek(exp.date);
-      if (filter === 'last-week') return isInLastWeek(exp.date);
+      if (filter === "this-week") return isInThisWeek(exp.date);
+      if (filter === "last-week") return isInLastWeek(exp.date);
       return true; // all-time
     });
   }, [expenses, filter]);
@@ -206,26 +213,29 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
 
     // Round category totals
-    (Object.keys(totals) as Category[]).forEach(cat => {
+    (Object.keys(totals) as Category[]).forEach((cat) => {
       totals[cat] = Math.round(totals[cat] * 100) / 100;
     });
 
     const totalSpend = Object.values(totals).reduce((sum, val) => sum + val, 0);
     const roundedTotalSpend = Math.round(totalSpend * 100) / 100;
 
-    return (Object.keys(totals) as Category[]).map((cat) => {
-      const amount = totals[cat];
-      const percentage = roundedTotalSpend > 0 ? (amount / roundedTotalSpend) * 100 : 0;
-      const config = CATEGORY_CONFIG[cat];
-      return {
-        category: cat,
-        label: config.label,
-        amount,
-        percentage,
-        color: config.color,
-        gradient: config.gradient,
-      };
-    }).sort((a, b) => b.amount - a.amount); // Order by highest spending first
+    return (Object.keys(totals) as Category[])
+      .map((cat) => {
+        const amount = totals[cat];
+        const percentage =
+          roundedTotalSpend > 0 ? (amount / roundedTotalSpend) * 100 : 0;
+        const config = CATEGORY_CONFIG[cat];
+        return {
+          category: cat,
+          label: config.label,
+          amount,
+          percentage,
+          color: config.color,
+          gradient: config.gradient,
+        };
+      })
+      .sort((a, b) => b.amount - a.amount); // Order by highest spending first
   }, [filteredExpenses]);
 
   // 5. Calculate daily spending (for Bar Chart)
@@ -237,14 +247,14 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
     let targetDates: string[] = [];
     const refDate = new Date();
 
-    if (filter === 'this-week') {
+    if (filter === "this-week") {
       const mon = getStartOfWeek(refDate);
       for (let i = 0; i < 7; i++) {
         const d = new Date(mon);
         d.setDate(mon.getDate() + i);
         targetDates.push(formatLocalDate(d));
       }
-    } else if (filter === 'last-week') {
+    } else if (filter === "last-week") {
       const thisMon = getStartOfWeek(refDate);
       const prevMon = new Date(thisMon);
       prevMon.setDate(thisMon.getDate() - 7);
@@ -261,7 +271,7 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return targetDates.map((dateStr) => {
       const dayDate = parseLocalDate(dateStr);
       // Weekday label
-      const label = dayDate.toLocaleDateString(undefined, { weekday: 'short' });
+      const label = dayDate.toLocaleDateString(undefined, { weekday: "short" });
       const rawAmount = filteredExpenses
         .filter((exp) => exp.date === dateStr)
         .reduce((sum, exp) => sum + exp.amount, 0);
@@ -299,7 +309,7 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
 export const useExpenses = () => {
   const context = useContext(ExpenseContext);
   if (!context) {
-    throw new Error('useExpenses must be used within an ExpenseProvider');
+    throw new Error("useExpenses must be used within an ExpenseProvider");
   }
   return context;
 };
